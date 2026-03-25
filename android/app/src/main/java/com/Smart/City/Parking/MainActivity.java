@@ -1,4 +1,4 @@
-package com.Smart.City.Parking;
+package com.smart.city.parking;
 
 import com.getcapacitor.BridgeActivity;
 

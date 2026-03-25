@@ -1,10 +1,10 @@
 apply plugin: 'com.android.application'
 
 android {
-    namespace = "com.Smart.City.Parking"
+    namespace = "com.smart.city.parking"
     compileSdk = rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "com.Smart.City.Parking"
+        applicationId "com.smart.city.parking"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

@@ -1,8 +1,8 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.Smart.City.Parking',
-  appName: 'Smart City Parking',
+  appId: 'com.smart.city.parking',
+  appName: 'City Parking',
   webDir: 'build'
 };
 

@@ -5,6 +5,8 @@ import { QrCode, CreditCard, Clock, AlertTriangle, Calendar, Ban } from "lucide-
 import { toast } from "react-toastify";
 import { BounceLoader } from "react-spinners";
 import loadingImg from "../assets/loading_img.png";
+import { Browser } from '@capacitor/browser';
+
 
 export default function ParkingCard({ data, dbUser }) {
   const [qr, setQr] = useState(null);
@@ -117,16 +119,27 @@ export default function ParkingCard({ data, dbUser }) {
   const handlePayment = async () => {
     const finalAmount = data.status === "repay" ? totalRepayFee : liveCost;
     try {
-      const res = await axios.post(`${BASE_URL}/api/payment/init`, {
-        parkingId: data._id, amount: finalAmount,
+      const res = await axios.post(`${BASE_URL}/api/apk/payment/init`, {
+        parkingId: data._id,
+        amount: finalAmount,
         name: user?.displayName || dbUser?.name,
         uid: user?.uid,
         email: user?.email || dbUser?.email,
         phone: user?.phoneNumber || dbUser?.phone,
         vehicleType: data.vehicleType
       });
-      if (res.data?.GatewayPageURL) window.location.href = res.data.GatewayPageURL;
-    } catch (err) { toast.error("Payment failed."); }
+
+      if (res.data?.GatewayPageURL) {
+        await Browser.open({ url: res.data.GatewayPageURL });
+
+        Browser.addListener('browserFinished', () => {
+          window.location.reload();
+          console.log("Payment browser closed");
+        });
+      }
+    } catch (err) {
+      toast.error("Payment failed.");
+    }
   };
 
   const formatDuration = (totalMinutes) => {

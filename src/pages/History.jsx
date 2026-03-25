@@ -10,6 +10,10 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import html2canvas from "html2canvas";
 
+import { Filesystem, Directory } from '@capacitor/filesystem';
+import { Share } from '@capacitor/share';
+import { Capacitor } from '@capacitor/core';
+
 import busIcon from "../assets/bus_icon.png";
 import carIcon from "../assets/car_icon.png";
 import bikeIcon from "../assets/bike_icon.png";
@@ -99,32 +103,61 @@ export default function History() {
     } catch (err) { console.error(err); }
   };
 
-  const downloadInvoice = async (h) => {
-    let currentPayments = paymentDetails[h._id];
-    if (!currentPayments) {
-      try {
-        const res = await axios.get(`${BASE_URL}/api/payments/${h._id}`);
-        currentPayments = res.data;
-        setPaymentDetails(prev => ({ ...prev, [h._id]: res.data }));
-      } catch (err) {
-        console.error("Failed to fetch payments for invoice:", err);
-        return;
-      }
+const downloadInvoice = async (h) => {
+  let currentPayments = paymentDetails[h._id];
+  if (!currentPayments) {
+    try {
+      const res = await axios.get(`${BASE_URL}/api/payments/${h._id}`);
+      currentPayments = res.data;
+      setPaymentDetails(prev => ({ ...prev, [h._id]: res.data }));
+    } catch (err) {
+      console.error("Failed to fetch payments for invoice:", err);
+      return;
     }
+  }
 
-    setTimeout(async () => {
-      const element = document.getElementById(`invoice-template-${h._id}`);
-      if (!element) return;
-      element.style.display = "block";
-      const canvas = await html2canvas(element, { scale: 3, useCORS: true });
-      const data = canvas.toDataURL("image/png");
+  setTimeout(async () => {
+    const element = document.getElementById(`invoice-template-${h._id}`);
+    if (!element) return;
+    
+    element.style.display = "block";
+    const canvas = await html2canvas(element, { scale: 3, useCORS: true });
+    const dataUrl = canvas.toDataURL("image/png");
+    element.style.display = "none";
+
+    const fileName = `Invoice_${h._id}.png`;
+
+    // Check if running on Native (Android/iOS)
+    if (Capacitor.isNativePlatform()) {
+      try {
+        // 1. Save the file to the device cache/temp folder
+        const savedFile = await Filesystem.writeFile({
+          path: fileName,
+          data: dataUrl, // The base64 string
+          directory: Directory.Cache,
+        });
+
+        // 2. Open the Native Share sheet so the user can save to Gallery or send via WhatsApp/Email
+        await Share.share({
+          title: 'Parking Invoice',
+          text: 'Here is your parking receipt',
+          url: savedFile.uri,
+          dialogTitle: 'Save Invoice',
+        });
+      } catch (error) {
+        console.error("Native save error:", error);
+      }
+    } else {
+      // Standard Web Download logic (kept for browser testing)
       const link = document.createElement('a');
-      link.href = data;
-      link.download = `Invoice_${h._id}.png`;
+      link.href = dataUrl;
+      link.download = fileName;
+      document.body.appendChild(link);
       link.click();
-      element.style.display = "none";
-    }, 100);
-  };
+      document.body.removeChild(link);
+    }
+  }, 100);
+};
 
   useEffect(() => {
     if (!user) return;
