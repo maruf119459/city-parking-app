@@ -1,9 +1,14 @@
-import type { CapacitorConfig } from '@capacitor/cli';
+import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.smart.city.parking',
-  appName: 'City Parking',
-  webDir: 'build'
+  appId: 'com.my.app',
+  appName: 'my-mobile',
+  webDir: 'build',
+  server: {
+    hostname: 'localhost',
+    androidScheme: 'http',
+    allowNavigation: ['smart-parking-backend-u47b.onrender.com']
+  }
 };
 
 export default config;
