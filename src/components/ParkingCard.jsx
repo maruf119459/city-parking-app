@@ -183,7 +183,7 @@ export default function ParkingCard({ data, dbUser }) {
                 {data.status === 'parked' && (
                   <>
                     <div><Clock size={14} /> <b>Entry:</b> {new Date(data.entryTime).toLocaleString()}</div>
-                    <div><AlertTriangle size={14} /> <b>Rate:</b> {data.parkingRate}</div>
+                    <div><AlertTriangle size={14} /> <b>Rate:</b> {rate} BDT / Per Minute</div>
                   </>
                 )}
                 {data.status === 'paid' && (
