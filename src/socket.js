@@ -1,5 +1,5 @@
 import { io } from "socket.io-client";
-export const socket = io("https://smart-parking-backend-u47b.onrender.com", {
+export const socket = io("https://city-parking-backend.onrender.com", {
   transports: ["websocket", "polling"],
   reconnection: true,
   reconnectionAttempts: 5,
